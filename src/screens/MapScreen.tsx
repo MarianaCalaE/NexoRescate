@@ -58,7 +58,6 @@ export function MapScreen({ visible }: { visible: boolean }) {
     const p = await app.locate();
     setLocating(false);
     if (p) app.flyTo(p.lat, p.lng, 15);
-    else app.toast(app.geoError ?? 'Ubicación no disponible', 'warn');
   };
 
   const quick = (lv: DisplayLevel) =>

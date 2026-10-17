@@ -9,6 +9,7 @@ import { IncidentDetail } from './screens/IncidentDetail';
 import { SmsSheet, LoraSheet, OfflinePanel, SettingsSheet } from './screens/Channels';
 import { cx, ConfirmDialog } from './components/ui';
 import { RegisterSheet } from './screens/Register';
+import { LocationHelpSheet } from './screens/LocationHelp';
 
 export default function App() {
   return (
@@ -129,6 +130,7 @@ function Shell() {
       {app.sheet?.kind === 'alerts' && <CitizenAlerts />}
       {app.sheet?.kind === 'access' && <AccessSheet />}
       {app.sheet?.kind === 'register' && <RegisterSheet />}
+      {app.sheet?.kind === 'location-help' && <LocationHelpSheet reason={app.sheet.reason} />}
       {app.confirmState && (
         <ConfirmDialog
           title={app.confirmState.title}

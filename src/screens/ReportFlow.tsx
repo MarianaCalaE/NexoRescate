@@ -37,7 +37,7 @@ export function ReportFlow({ onClose }: { onClose: () => void }) {
     if (d.lat != null) setTimeout(() => app.flyTo(d.lat!, d.lng!, 16), 60);
     if (d.lat == null && gps === 'idle') {
       setGps('buscando');
-      app.locate().then((p) => {
+      app.locate({ silent: true }).then((p) => {
         if (p) {
           setGps('ok');
           app.setDraft({ lat: +p.lat.toFixed(6), lng: +p.lng.toFixed(6), accuracyM: p.accuracy, locationPrecision: 'gps' });

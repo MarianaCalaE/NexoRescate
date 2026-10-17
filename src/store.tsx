@@ -11,7 +11,7 @@ import { haversineKm } from './data/places';
 import { CAT } from './data/categories';
 
 export type Tab = 'mapa' | 'alertas' | 'reportar' | 'reportes' | 'enlace';
-export type Sheet = null | { kind: 'detail'; id: string } | { kind: 'sms'; id: string } | { kind: 'lora'; id?: string } | { kind: 'offline' } | { kind: 'settings' } | { kind: 'access' } | { kind: 'mine' } | { kind: 'alerts' } | { kind: 'register' };
+export type Sheet = null | { kind: 'detail'; id: string } | { kind: 'sms'; id: string } | { kind: 'lora'; id?: string } | { kind: 'offline' } | { kind: 'settings' } | { kind: 'access' } | { kind: 'mine' } | { kind: 'alerts' } | { kind: 'register' } | { kind: 'location-help'; reason: LocationProblem };
 
 export interface Draft {
   draftId: string;
@@ -28,6 +28,19 @@ export interface Draft {
   infrastructure: NonNullable<Incident['infrastructure']>;
   duplicateOf: string | null;
   address: string;
+}
+
+export type LocationProblem = 'denegado' | 'no_disponible' | 'inseguro' | 'no_soportado' | 'navegador_app';
+export const LOCATION_MESSAGES: Record<LocationProblem, string> = {
+  denegado: 'El navegador no tiene permiso para usar tu ubicación.',
+  no_disponible: 'El teléfono no encontró tu ubicación.',
+  inseguro: 'La ubicación solo funciona en páginas seguras (https).',
+  no_soportado: 'Este navegador no ofrece ubicación.',
+  navegador_app: 'El navegador dentro de esta app no comparte la ubicación.',
+};
+/** Navegadores incrustados (WhatsApp, Instagram, Facebook, TikTok…) suelen bloquear la ubicación. */
+export function isInAppBrowser() {
+  return /FBAN|FBAV|Instagram|WhatsApp|Line\/|TikTok|Snapchat|Twitter|; wv\)/i.test(navigator.userAgent);
 }
 
 export interface ConfirmRequest {
@@ -83,7 +96,8 @@ interface Ctx {
   flyTo: (lat: number, lng: number, zoom?: number) => void;
   userPos: UserPos | null;
   geoError: string | null;
-  locate: () => Promise<UserPos | null>;
+  locate: (opts?: { silent?: boolean }) => Promise<UserPos | null>;
+  locating: boolean;
   pick: { active: boolean; lat: number | null; lng: number | null };
   setPick: (p: { active: boolean; lat: number | null; lng: number | null }) => void;
   draft: Draft;
@@ -158,6 +172,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [flyTarget, setFlyTarget] = useState<Ctx['flyTarget']>(null);
   const [userPos, setUserPos] = useState<UserPos | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
+  const [locating, setLocating] = useState(false);
   const [pick, setPick] = useState<Ctx['pick']>({ active: false, lat: null, lng: null });
   const [draft, setDraftState] = useState<Draft>(emptyDraft);
   const [toasts, setToasts] = useState<Ctx['toasts']>([]);
@@ -310,32 +325,80 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const flyTo = useCallback((lat: number, lng: number, zoom?: number) => setFlyTarget({ lat, lng, zoom, key: Date.now() }), []);
 
-  const locate = useCallback(async () => {
-    if (!('geolocation' in navigator)) {
-      setGeoError('Este dispositivo no ofrece geolocalización.');
+  /**
+   * Ubicación robusta:
+   *  1) verifica página segura (https) y permiso; 2) pide primero una ubicación rápida (red/wifi),
+   *  3) si falla, insiste con GPS de alta precisión; 4) luego refina en segundo plano unos segundos.
+   *  Un temporizador propio evita quedar esperando si el navegador nunca responde.
+   */
+  const watchRef = useRef<number | null>(null);
+  const locate = useCallback(async (opts?: { silent?: boolean }): Promise<UserPos | null> => {
+    const fail = (reason: LocationProblem) => {
+      setGeoError(LOCATION_MESSAGES[reason]);
+      if (!opts?.silent) setSheet({ kind: 'location-help', reason });
       return null;
+    };
+    if (!window.isSecureContext) return fail('inseguro');
+    if (!('geolocation' in navigator)) return fail('no_soportado');
+    try {
+      const perm = await navigator.permissions?.query({ name: 'geolocation' as PermissionName });
+      if (perm?.state === 'denied') return fail(isInAppBrowser() ? 'navegador_app' : 'denegado');
+    } catch {
+      /* algunos navegadores no permiten consultar el permiso */
     }
-    return new Promise<UserPos | null>((resolve) => {
-      navigator.geolocation.getCurrentPosition(
-        (p) => {
-          const pos = { lat: p.coords.latitude, lng: p.coords.longitude, accuracy: p.coords.accuracy, at: Date.now() };
-          setUserPos(pos);
-          setGeoError(null);
-          resolve(pos);
+    const getPos = (o: PositionOptions, watchdogMs: number) =>
+      new Promise<GeolocationPosition>((resolve, reject) => {
+        const t = setTimeout(() => reject({ code: 3, message: 'sin respuesta' }), watchdogMs);
+        navigator.geolocation.getCurrentPosition(
+          (p) => {
+            clearTimeout(t);
+            resolve(p);
+          },
+          (e) => {
+            clearTimeout(t);
+            reject(e);
+          },
+          o,
+        );
+      });
+    setLocating(true);
+    let p: GeolocationPosition | null = null;
+    try {
+      p = await getPos({ enableHighAccuracy: false, maximumAge: 120_000, timeout: 8_000 }, 10_000);
+    } catch (e) {
+      const code = (e as GeolocationPositionError).code;
+      if (code === 1) {
+        setLocating(false);
+        return fail(isInAppBrowser() ? 'navegador_app' : 'denegado');
+      }
+      try {
+        p = await getPos({ enableHighAccuracy: true, maximumAge: 0, timeout: 12_000 }, 14_000);
+      } catch (e2) {
+        setLocating(false);
+        return fail((e2 as GeolocationPositionError).code === 1 ? 'denegado' : 'no_disponible');
+      }
+    }
+    setLocating(false);
+    const pos: UserPos = { lat: p.coords.latitude, lng: p.coords.longitude, accuracy: p.coords.accuracy, at: Date.now() };
+    setUserPos(pos);
+    setGeoError(null);
+    // Refinar con GPS durante unos segundos si la primera lectura fue imprecisa.
+    if (pos.accuracy > 50) {
+      if (watchRef.current != null) navigator.geolocation.clearWatch(watchRef.current);
+      const id = navigator.geolocation.watchPosition(
+        (q) => {
+          if (q.coords.accuracy < pos.accuracy) {
+            setUserPos({ lat: q.coords.latitude, lng: q.coords.longitude, accuracy: q.coords.accuracy, at: Date.now() });
+            if (q.coords.accuracy <= 30) navigator.geolocation.clearWatch(id);
+          }
         },
-        (err) => {
-          const msg =
-            err.code === err.PERMISSION_DENIED
-              ? 'Permiso de ubicación denegado. Puede marcar el punto manualmente en el mapa.'
-              : err.code === err.TIMEOUT
-                ? 'El GPS tardó demasiado. Intente de nuevo o marque el punto en el mapa.'
-                : 'Ubicación no disponible en este momento.';
-          setGeoError(msg);
-          resolve(null);
-        },
-        { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 },
+        () => navigator.geolocation.clearWatch(id),
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 20_000 },
       );
-    });
+      watchRef.current = id;
+      setTimeout(() => navigator.geolocation.clearWatch(id), 30_000);
+    }
+    return pos;
   }, []);
 
   const setDraft = useCallback((d: Partial<Draft>) => setDraftState((prev) => ({ ...prev, ...d })), []);
@@ -725,7 +788,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const value: Ctx = {
     profile, saveProfile, clearProfile, confirmState, askConfirm, backHandler,
     ready, session, login, logout, assignUnit, verify, fieldNote, incidents, assessments, duplicatesOf, ops, log, lora, settings, online, browserOnline, lastSync, syncing, alerts, usgs,
-    tab, setTab, sheet, setSheet, selectedId, select, flyTarget, flyTo, userPos, geoError, locate, pick, setPick,
+    tab, setTab, sheet, setSheet, selectedId, select, flyTarget, flyTo, userPos, geoError, locate, locating, pick, setPick,
     draft, setDraft, resetDraft, createIncident, updateIncident, confirmActive, contribute, setAttention, markPendingSend,
     markSentByChannel, prepareSms, confirmSms, relay, autoRelay, saveSettings, simulateReconnect, resetDemo, refresh, loadUsgs, findDuplicates, toast, toasts,
   };

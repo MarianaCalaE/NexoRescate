@@ -41,7 +41,6 @@ export function CitizenApp() {
     const p = await app.locate();
     setLocating(false);
     if (p) app.flyTo(p.lat, p.lng, 15);
-    else app.toast(app.geoError ?? 'No pudimos obtener tu ubicación', 'warn');
   };
 
   return (
