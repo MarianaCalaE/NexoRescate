@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import type L from 'leaflet';
 import { Menu, LocateFixed, Loader2, Wifi, WifiOff, ChevronRight, Inbox, BellRing, ShieldCheck, Info, Siren, CloudRain, Mountain, Waves, CloudLightning, Activity, Building2, Radio, Check, IdCard } from 'lucide-react';
-import { useApp } from '../store';
+import { useApp, isInAppBrowser, openInSystemBrowser } from '../store';
 import { MapView } from '../components/MapView';
 import { Logo } from '../components/Logo';
 import { ReportFlow } from './ReportFlow';
@@ -80,7 +80,22 @@ export function CitizenApp() {
             <ChevronRight size={20} className="text-ink-3" />
           </button>
         )}
-        {!app.userPos && (app.locPerm === 'prompt' || app.locPerm === 'unknown') && (
+        {!app.userPos && isInAppBrowser() && (
+          <button
+            onClick={openInSystemBrowser}
+            className="mt-2 flex w-full items-center gap-3 rounded-2xl bg-surface/95 px-3 py-2.5 text-left shadow-card backdrop-blur lg:max-w-[420px]"
+          >
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand">
+              <LocateFixed size={20} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[15px] font-bold">Abre en el navegador</span>
+              <span className="block truncate text-sm text-ink-3">Aquí dentro no se puede usar tu ubicación.</span>
+            </span>
+            <span className="rounded-xl bg-brand px-3 py-2 text-sm font-bold text-on-brand">Abrir</span>
+          </button>
+        )}
+        {!app.userPos && !isInAppBrowser() && app.locPerm !== 'granted' && (
           <button
             onClick={async () => {
               const p = await app.locate();

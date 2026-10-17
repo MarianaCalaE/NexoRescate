@@ -39,6 +39,17 @@ export const LOCATION_MESSAGES: Record<LocationProblem, string> = {
   navegador_app: 'El navegador dentro de esta app no comparte la ubicación.',
 };
 /** Navegadores incrustados (WhatsApp, Instagram, Facebook, TikTok…) suelen bloquear la ubicación. */
+/** Abre la misma página en el navegador del sistema (Chrome en Android, Safari en iPhone). */
+export function openInSystemBrowser() {
+  const url = location.href;
+  if (/Android/i.test(navigator.userAgent)) {
+    const noScheme = url.replace(/^https?:\/\//, '');
+    location.href = `intent://${noScheme}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(url)};end`;
+  } else {
+    location.href = url.replace(/^https:\/\//, 'x-safari-https://');
+  }
+}
+
 export function isInAppBrowser() {
   return /FBAN|FBAV|Instagram|WhatsApp|Line\/|TikTok|Snapchat|Twitter|; wv\)/i.test(navigator.userAgent);
 }
@@ -347,12 +358,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
     if (!window.isSecureContext) return fail('inseguro');
     if (!('geolocation' in navigator)) return fail('no_soportado');
-    try {
-      const perm = await navigator.permissions?.query({ name: 'geolocation' as PermissionName });
-      if (perm?.state === 'denied') return fail(isInAppBrowser() ? 'navegador_app' : 'denegado');
-    } catch {
-      /* algunos navegadores no permiten consultar el permiso */
-    }
+    // No se corta aunque el permiso figure como bloqueado: algunos navegadores (Safari) sí vuelven a
+    // preguntar, y si de verdad está bloqueado la respuesta llega al instante.
     const getPos = (o: PositionOptions, watchdogMs: number) =>
       new Promise<GeolocationPosition>((resolve, reject) => {
         const t = setTimeout(() => reject({ code: 3, message: 'sin respuesta' }), watchdogMs);
