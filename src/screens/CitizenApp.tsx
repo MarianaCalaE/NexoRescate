@@ -80,6 +80,24 @@ export function CitizenApp() {
             <ChevronRight size={20} className="text-ink-3" />
           </button>
         )}
+        {!app.userPos && (app.locPerm === 'prompt' || app.locPerm === 'unknown') && (
+          <button
+            onClick={async () => {
+              const p = await app.locate();
+              if (p) app.flyTo(p.lat, p.lng, 15);
+            }}
+            className="mt-2 flex w-full items-center gap-3 rounded-2xl bg-surface/95 px-3 py-2.5 text-left shadow-card backdrop-blur lg:max-w-[420px]"
+          >
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand">
+              {app.locating ? <Loader2 size={20} className="animate-spin" /> : <LocateFixed size={20} />}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[15px] font-bold">{app.locating ? 'Buscando tu ubicación…' : 'Activa tu ubicación'}</span>
+              <span className="block truncate text-sm text-ink-3">Así la ayuda sabe dónde estás.</span>
+            </span>
+            {!app.locating && <span className="rounded-xl bg-brand px-3 py-2 text-sm font-bold text-on-brand">Activar</span>}
+          </button>
+        )}
         {!app.profile && (
           <button
             onClick={() => app.setSheet({ kind: 'register' })}

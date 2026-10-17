@@ -56,7 +56,7 @@ El mapa usa **Leaflet** con cartografía real y coordenadas WGS84 reales:
 | Local offline | Natural Earth (dominio público): países, departamentos, límite del Chocó, río Atrato, vías; ríos San Juan y Baudó trazados aproximados; cabeceras municipales | **No** |
 
 - **Marcar puntos reales:** en «Reportar → Marcar el punto en el mapa», toca cualquier lugar; el pin se puede arrastrar. Con internet se obtiene la dirección (OpenStreetMap Nominatim, geocodificación inversa); sin internet, se calcula la cabecera más cercana.
-- **GPS real** del dispositivo (con precisión en metros) y botón «Mi ubicación».
+- **GPS real** del dispositivo. La app pide el permiso sola al abrir (ventana nativa del navegador); si se cerró sin responder, un botón «Activa tu ubicación» la vuelve a pedir con un toque. Primero usa una ubicación rápida (wifi/red) y luego la afina con GPS. Si está bloqueada, la persona sigue sin interrupciones escribiendo la dirección o tocando el mapa; los pasos para desbloquearla quedan ocultos como opción.
 - **Buscador:** incidentes + nomenclátor local del Chocó (offline) + OpenStreetMap Nominatim (online, con debounce para respetar 1 consulta/s).
 - **Sismos reales (opcional):** capa con el feed público del USGS (M2.5+, 30 días), claramente marcada como «DATO REAL».
 - **Clústeres** coloreados por la prioridad más alta, pines por categoría con anillo de prioridad, insignia de reportes agrupados.

@@ -103,7 +103,7 @@ export function ReportFlow({ onClose }: { onClose: () => void }) {
 
   const useMyLocation = async () => {
     setGps('buscando');
-    const p = await app.locate();
+    const p = await app.locate({ silent: true });
     if (p) {
       setGps('ok');
       app.setDraft({ lat: +p.lat.toFixed(6), lng: +p.lng.toFixed(6), accuracyM: p.accuracy, locationPrecision: 'gps' });
@@ -238,7 +238,16 @@ export function ReportFlow({ onClose }: { onClose: () => void }) {
               {gps === 'buscando' ? <Loader2 size={20} className="animate-spin" /> : <LocateFixed size={20} />}
               {gps === 'buscando' ? 'Buscando tu ubicación…' : d.locationPrecision === 'gps' ? 'Usando tu ubicación actual' : 'Usar tu ubicación actual'}
             </button>
-            {gps === 'error' && <p className="mt-1.5 text-sm text-ink-3">No pudimos obtener tu ubicación. Escribe la dirección o toca el mapa.</p>}
+            {gps === 'error' && (
+              <p className="mt-1.5 text-[15px] text-ink-2">
+                {app.locPerm === 'denied' ? 'La ubicación está bloqueada en este teléfono.' : 'No encontramos tu ubicación.'} Escribe la dirección o toca el mapa.{' '}
+                {app.locProblem && (
+                  <button onClick={() => app.setSheet({ kind: 'location-help', reason: app.locProblem! })} className="font-semibold text-brand underline">
+                    Más opciones
+                  </button>
+                )}
+              </p>
+            )}
           </div>
 
           <div className="relative mx-3 min-h-[140px] flex-1 overflow-hidden rounded-[24px] border border-line">

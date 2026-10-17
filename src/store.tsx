@@ -98,6 +98,9 @@ interface Ctx {
   geoError: string | null;
   locate: (opts?: { silent?: boolean }) => Promise<UserPos | null>;
   locating: boolean;
+  /** Estado del permiso de ubicación del navegador. */
+  locPerm: 'granted' | 'prompt' | 'denied' | 'unknown';
+  locProblem: LocationProblem | null;
   pick: { active: boolean; lat: number | null; lng: number | null };
   setPick: (p: { active: boolean; lat: number | null; lng: number | null }) => void;
   draft: Draft;
@@ -173,6 +176,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [userPos, setUserPos] = useState<UserPos | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
+  const [locPerm, setLocPerm] = useState<Ctx['locPerm']>('unknown');
+  const [locProblem, setLocProblem] = useState<LocationProblem | null>(null);
   const [pick, setPick] = useState<Ctx['pick']>({ active: false, lat: null, lng: null });
   const [draft, setDraftState] = useState<Draft>(emptyDraft);
   const [toasts, setToasts] = useState<Ctx['toasts']>([]);
@@ -335,6 +340,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const locate = useCallback(async (opts?: { silent?: boolean }): Promise<UserPos | null> => {
     const fail = (reason: LocationProblem) => {
       setGeoError(LOCATION_MESSAGES[reason]);
+      setLocProblem(reason);
+      if (reason === 'denegado' || reason === 'navegador_app') setLocPerm('denied');
       if (!opts?.silent) setSheet({ kind: 'location-help', reason });
       return null;
     };
@@ -382,6 +389,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const pos: UserPos = { lat: p.coords.latitude, lng: p.coords.longitude, accuracy: p.coords.accuracy, at: Date.now() };
     setUserPos(pos);
     setGeoError(null);
+    setLocProblem(null);
+    setLocPerm('granted');
     // Refinar con GPS durante unos segundos si la primera lectura fue imprecisa.
     if (pos.accuracy > 50) {
       if (watchRef.current != null) navigator.geolocation.clearWatch(watchRef.current);
@@ -400,6 +409,40 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     return pos;
   }, []);
+
+  // La app pide el permiso de ubicación sola al abrir (ventana nativa del navegador)
+  // y sigue el estado del permiso para reaccionar si la persona lo concede después.
+  const autoAsked = useRef(false);
+  useEffect(() => {
+    if (!ready) return;
+    let status: PermissionStatus | null = null;
+    const apply = (st: PermissionState) => {
+      setLocPerm(st);
+      if (st === 'granted') locate({ silent: true });
+    };
+    (async () => {
+      try {
+        status = await navigator.permissions.query({ name: 'geolocation' as PermissionName });
+        apply(status.state);
+        status.onchange = () => status && apply(status.state);
+        if (status.state === 'prompt' && !autoAsked.current) {
+          autoAsked.current = true;
+          locate({ silent: true });
+        }
+      } catch {
+        // Safari antiguo: sin API de permisos. Se pide directamente.
+        if (!autoAsked.current) {
+          autoAsked.current = true;
+          const p = await locate({ silent: true });
+          setLocPerm(p ? 'granted' : 'unknown');
+        }
+      }
+    })();
+    return () => {
+      if (status) status.onchange = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
 
   const setDraft = useCallback((d: Partial<Draft>) => setDraftState((prev) => ({ ...prev, ...d })), []);
   const resetDraft = useCallback(() => setDraftState(emptyDraft()), []);
@@ -788,7 +831,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const value: Ctx = {
     profile, saveProfile, clearProfile, confirmState, askConfirm, backHandler,
     ready, session, login, logout, assignUnit, verify, fieldNote, incidents, assessments, duplicatesOf, ops, log, lora, settings, online, browserOnline, lastSync, syncing, alerts, usgs,
-    tab, setTab, sheet, setSheet, selectedId, select, flyTarget, flyTo, userPos, geoError, locate, locating, pick, setPick,
+    tab, setTab, sheet, setSheet, selectedId, select, flyTarget, flyTo, userPos, geoError, locate, locating, locPerm, locProblem, pick, setPick,
     draft, setDraft, resetDraft, createIncident, updateIncident, confirmActive, contribute, setAttention, markPendingSend,
     markSentByChannel, prepareSms, confirmSms, relay, autoRelay, saveSettings, simulateReconnect, resetDemo, refresh, loadUsgs, findDuplicates, toast, toasts,
   };
