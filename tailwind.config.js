@@ -10,6 +10,9 @@ const tokens = [
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
+    borderRadius: {
+      none: '0', sm: '2px', DEFAULT: '4px', md: '4px', lg: '6px', xl: '6px', '2xl': '8px', '3xl': '10px', full: '9999px',
+    },
     extend: {
       fontFamily: {
         sans: ['"Atkinson Hyperlegible Next Variable"', '"Atkinson Hyperlegible Next"', 'system-ui', 'sans-serif'],
@@ -18,8 +21,8 @@ export default {
       },
       colors: Object.fromEntries(tokens.map((t) => [t, v(t)])),
       boxShadow: {
-        card: '0 1px 2px rgb(var(--shadow) / .10), 0 6px 18px -10px rgb(var(--shadow) / .35)',
-        float: '0 18px 40px -16px rgb(var(--shadow) / .55)',
+        card: '0 0 0 1px rgb(var(--shadow) / .10), 0 2px 0 rgb(var(--shadow) / .12)',
+        float: '0 0 0 1px rgb(var(--shadow) / .10), 0 -2px 0 rgb(var(--shadow) / .06), 0 10px 24px -16px rgb(var(--shadow) / .5)',
       },
     },
   },

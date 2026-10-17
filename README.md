@@ -142,3 +142,11 @@ tests/core.test.ts        Pruebas unitarias
 **Fuentes oficiales**
 - Adaptadores verificados para SGC, IDEAM, DIMAR y UNGRD (no se inventaron endpoints).
 - Integración con Ushahidi u otra plataforma vía `CentralTransport`.
+
+## Dictado por voz (Vosk)
+
+En el paso «¿Algo más?» del reporte hay un botón **Dictar con tu voz**. Usa [Vosk](https://alphacephei.com/vosk/) (código abierto) compilado a WebAssembly con `vosk-browser`: la voz se reconoce dentro del teléfono y, después de la primera descarga del modelo de español (~40 MB), funciona sin internet.
+
+- El modelo se busca en este orden: `VITE_VOSK_MODEL_URL` → `public/models/vosk-model-small-es.tar.gz` → copia pública del proyecto vosk-browser.
+- Para servirlo desde tu propio dominio (recomendado): `./scripts/get-vosk-model.sh` y vuelve a desplegar.
+- Si no hay modelo ni internet, la app lo dice y la persona puede escribir. Si el navegador trae reconocimiento propio, se usa como respaldo.

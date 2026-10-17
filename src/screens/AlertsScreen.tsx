@@ -87,7 +87,7 @@ export function AlertsScreen() {
                 <div className="text-sm font-bold text-ink">{s.name}</div>
                 <div className="text-[11px] text-ink-3">{s.scope}</div>
               </div>
-              <span className="rounded-full bg-surface-2 px-2 py-0.5 text-[10px] font-bold text-ink-2">{s.status}</span>
+              <span className="rounded-md bg-surface-2 px-2 py-0.5 text-[10px] font-bold text-ink-2">{s.status}</span>
             </div>
           ))}
         </div>
@@ -109,7 +109,7 @@ function AlertCard({ a, compact }: { a: OfficialAlert; compact?: boolean }) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1.5">
             {a.simulated ? <SimTag /> : <RealTag />}
-            <span className={cx('rounded-full px-2 py-0.5 text-[10px] font-bold ', LEVEL[a.level])}>{a.level === 'informativa' ? 'Informativa' : `Alerta ${a.level}`}</span>
+            <span className={cx('rounded-md px-2 py-0.5 text-[10px] font-bold ', LEVEL[a.level])}>{a.level === 'informativa' ? 'Informativa' : `Alerta ${a.level}`}</span>
           </div>
           <div className="mt-1 font-bold leading-snug text-ink">{a.title}</div>
           {!compact && <p className="mt-1 text-sm text-ink-2">{a.body}</p>}

@@ -24,13 +24,13 @@ export function fmtTime(ms: number) {
   return new Date(ms).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 }
 
-const pill = 'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold leading-5';
+const pill = 'inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold leading-5';
 
 export function LevelBadge({ level, size = 'md' }: { level: DisplayLevel; size?: 'sm' | 'md' }) {
   const m = LEVEL_META[level];
   return (
     <span className={cx(pill, m.soft, m.ink, size === 'md' && 'px-2.5 text-sm')}>
-      <span className="grid h-4 min-w-4 place-items-center rounded-full px-1 font-data text-[11px] font-bold leading-none" style={{ background: m.color, color: ['moderada', 'alta', 'atendido'].includes(level) ? '#241034' : '#fff' }}>
+      <span className="grid h-4 min-w-4 place-items-center rounded-md px-1 font-data text-[11px] font-bold leading-none" style={{ background: m.color, color: ['moderada', 'alta', 'atendido'].includes(level) ? '#241034' : '#fff' }}>
         {m.glyph}
       </span>
       {m.label}
@@ -120,18 +120,18 @@ export function Sheet({
         role="dialog"
         aria-modal="true"
         className={cx(
-          'sheet-enter flex w-full flex-col overflow-hidden rounded-t-[28px] bg-surface text-ink shadow-float lg:max-w-lg lg:rounded-[28px]',
+          'sheet-enter flex w-full flex-col overflow-hidden rounded-t-[10px] bg-surface text-ink shadow-float lg:max-w-lg lg:rounded-[10px]',
           full ? 'h-[94dvh] lg:h-[88vh]' : 'max-h-[92dvh] lg:max-h-[88vh]',
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-line lg:hidden" />
+        <div className="mx-auto mt-2 h-1 w-10 rounded-md bg-line lg:hidden" />
         <div className="flex items-start gap-3 px-5 pb-3 pt-3">
           <div className="min-w-0 flex-1">
             <div className="text-lg font-bold leading-tight">{title}</div>
             {subtitle && <div className="mt-1 text-sm text-ink-3">{subtitle}</div>}
           </div>
-          <button onClick={onClose} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-surface-2 text-ink-2 hover:bg-surface-3" aria-label="Cerrar">
+          <button onClick={onClose} className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-surface-2 text-ink-2 hover:bg-surface-3" aria-label="Cerrar">
             <X size={20} />
           </button>
         </div>
@@ -171,7 +171,7 @@ export function Btn({
     act: 'bg-act text-on-act hover:brightness-105',
     ok: 'bg-ok text-on-ok hover:brightness-110',
   };
-  const sizes = { sm: 'min-h-[40px] px-3 text-sm rounded-xl', md: 'min-h-[52px] px-4 text-base rounded-2xl', lg: 'min-h-[64px] px-5 text-lg rounded-[20px]' };
+  const sizes = { sm: 'min-h-[40px] px-3 text-sm rounded-xl', md: 'min-h-[52px] px-4 text-base rounded-2xl', lg: 'min-h-[64px] px-5 text-lg rounded-[8px]' };
   const cls = cx(
     'inline-flex items-center justify-center gap-2 font-bold transition active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-40',
     sizes[size],
@@ -197,11 +197,11 @@ export function Chip({ active, onClick, children, color }: { active?: boolean; o
       onClick={onClick}
       aria-pressed={active}
       className={cx(
-        'inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 text-sm font-semibold transition',
+        'inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border px-3 text-sm font-semibold transition',
         active ? 'border-ink bg-ink text-paper' : 'border-line bg-surface text-ink-2 hover:bg-surface-2',
       )}
     >
-      {color && <span className="h-2.5 w-2.5 rounded-full" style={{ background: color }} />}
+      {color && <span className="h-2.5 w-2.5 rounded-md" style={{ background: color }} />}
       {children}
     </button>
   );
@@ -270,7 +270,7 @@ export function ConfirmDialog({
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="nr-confirm-title"
-        className="sheet-enter w-full rounded-t-[28px] bg-surface p-5 pb-[calc(20px+var(--safe-b))] text-ink shadow-float sm:max-w-md sm:rounded-[28px]"
+        className="sheet-enter w-full rounded-t-[10px] bg-surface p-5 pb-[calc(20px+var(--safe-b))] text-ink shadow-float sm:max-w-md sm:rounded-[10px]"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 id="nr-confirm-title" className="font-display text-[28px] font-bold leading-tight">

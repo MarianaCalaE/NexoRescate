@@ -99,7 +99,7 @@ body {
 #root { background: rgb(var(--paper)); color: rgb(var(--ink)); font-family: theme('fontFamily.sans'); }
 * { box-sizing: border-box; }
 button { touch-action: manipulation; }
-:focus-visible { outline: 3px solid rgb(var(--brand)); outline-offset: 2px; border-radius: 10px; }
+:focus-visible { outline: 3px solid rgb(var(--brand)); outline-offset: 2px; border-radius: 4px; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
 .tnum { font-variant-numeric: tabular-nums; }
@@ -110,14 +110,14 @@ button { touch-action: manipulation; }
 .nr-map.picking, .nr-map.picking .leaflet-interactive { cursor: crosshair !important; }
 .leaflet-container { font-family: inherit; }
 .leaflet-bottom { bottom: var(--map-bottom); }
-.leaflet-control-attribution { font-size: 10px; background: rgb(var(--surface) / .82) !important; color: rgb(var(--ink-3)); border-radius: 8px 0 0 0; }
+.leaflet-control-attribution { font-size: 10px; background: rgb(var(--surface) / .82) !important; color: rgb(var(--ink-3)); border-radius: 4px 0 0 0; }
 .leaflet-control-attribution a { color: rgb(var(--brand)); }
 .leaflet-control-scale-line { border-color: rgb(var(--ink)); color: rgb(var(--ink)); background: rgb(var(--surface) / .8); font-weight: 600; }
 .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: rgb(var(--surface)); color: rgb(var(--ink)); }
-.leaflet-popup-content-wrapper { border-radius: 14px; box-shadow: 0 14px 30px -12px rgb(var(--shadow) / .6); }
+.leaflet-popup-content-wrapper { border-radius: 6px; box-shadow: 0 14px 30px -12px rgb(var(--shadow) / .6); }
 .leaflet-popup-content { margin: 12px 14px; font-size: 13px; line-height: 1.45; }
 .leaflet-popup-content a { color: rgb(var(--brand)); }
-.nr-pop .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; margin-bottom: 4px; }
+.nr-pop .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 3px; margin-bottom: 4px; }
 .nr-pop .tag.sim { background: rgb(var(--warn-soft)); color: rgb(var(--warn-ink)); }
 .nr-pop .tag.real { background: rgb(var(--ok-soft)); color: rgb(var(--ok-ink)); }
 [data-theme='ops'] .nr-map .leaflet-tile-pane { filter: saturate(.8) hue-rotate(-10deg); }
@@ -138,8 +138,8 @@ button { touch-action: manipulation; }
 .nr-pin.is-done .nr-pin-head { filter: saturate(.3); }
 .nr-pin.is-sel .nr-pin-head { box-shadow: 0 0 0 4px var(--p), 0 0 0 10px rgb(var(--brand) / .3); }
 .nr-done { position: absolute; right: -6px; bottom: 6px; width: 18px; height: 18px; border-radius: 999px; background: rgb(var(--ok)); color: rgb(var(--on-ok)); font-size: 11px; display: grid; place-items: center; font-weight: 900; border: 2px solid var(--pin-ring); }
-.nr-mine { position: absolute; left: -10px; top: -6px; background: rgb(var(--act)); color: #241034; font: 700 10px/12px 'Barlow Semi Condensed', sans-serif; border-radius: 6px; padding: 1px 4px; border: 2px solid var(--pin-ring); }
-.nr-unit { width: 30px; height: 30px; border-radius: 9px; background: rgb(var(--brand)); color: rgb(var(--on-brand)); display: grid; place-items: center; border: 2px solid var(--pin-ring); box-shadow: 0 4px 10px rgb(0 0 0 / .35); font: 700 11px/1 'Barlow Semi Condensed', sans-serif; }
+.nr-mine { position: absolute; left: -10px; top: -6px; background: rgb(var(--act)); color: #241034; font: 700 10px/12px 'Barlow Semi Condensed', sans-serif; border-radius: 3px; padding: 1px 4px; border: 2px solid var(--pin-ring); }
+.nr-unit { width: 30px; height: 30px; border-radius: 4px; background: rgb(var(--brand)); color: rgb(var(--on-brand)); display: grid; place-items: center; border: 2px solid var(--pin-ring); box-shadow: 0 4px 10px rgb(0 0 0 / .35); font: 700 11px/1 'Barlow Semi Condensed', sans-serif; }
 @keyframes nrPulse { 0% { box-shadow: 0 0 0 3px var(--p), 0 0 0 3px rgb(254 22 71 / .6); } 100% { box-shadow: 0 0 0 3px var(--p), 0 0 0 16px rgb(254 22 71 / 0); } }
 
 .nr-cluster-wrap { background: none; }

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type L from 'leaflet';
-import { Menu, LocateFixed, Loader2, Wifi, WifiOff, ChevronRight, Inbox, BellRing, ShieldCheck, Info, Siren, CloudRain, Mountain, Waves, CloudLightning, Activity, Building2, Radio, Check, IdCard } from 'lucide-react';
+import { Menu, LocateFixed, Loader2, Wifi, WifiOff, ChevronRight, Inbox, BellRing, ShieldCheck, Info, Siren, CloudRain, Mountain, Waves, CloudLightning, Activity, Building2, Radio, Check, IdCard, Phone } from 'lucide-react';
 import { useApp, isInAppBrowser, openInSystemBrowser } from '../store';
 import { MapView } from '../components/MapView';
 import { Logo } from '../components/Logo';
@@ -44,104 +44,72 @@ export function CitizenApp() {
   };
 
   return (
-    <div className="relative h-full w-full overflow-hidden [--map-bottom:calc(178px+var(--safe-b))] lg:[--map-bottom:0px]">
+    <div className="relative h-full w-full overflow-hidden [--map-bottom:calc(214px+var(--safe-b))] lg:[--map-bottom:0px]">
       <div className="absolute inset-0">
         <MapView incidents={visible} variant="citizen" baseLayer={app.settings.baseLayer} onMap={(m) => (mapRef.current = m)} />
       </div>
 
-      {/* Barra superior: solo marca, estado de conexión y menú */}
+      {/* Barra superior: marca, conexión y menú */}
       <header className="absolute inset-x-0 top-0 z-[700] px-3 pt-[calc(10px+var(--safe-t))]">
         <div className="flex items-center gap-2">
-          <div className="flex h-12 items-center gap-2 rounded-2xl bg-surface/95 pl-2 pr-3 shadow-card backdrop-blur">
+          <div className="flex h-12 items-center gap-2 rounded-lg bg-surface pl-2 pr-3 shadow-card">
             <Mark />
             <span className="font-display text-xl font-bold tracking-tight">NexoRescate</span>
           </div>
           <div className="flex-1" />
           <button
             onClick={() => app.setSheet({ kind: 'offline' })}
-            className={cx('flex h-12 items-center gap-2 rounded-2xl px-3 text-sm font-semibold shadow-card', app.online ? 'bg-surface/95 text-ok-ink' : 'bg-act text-on-act')}
+            className={cx('flex h-12 items-center gap-1.5 rounded-lg px-3 text-sm font-bold shadow-card', app.online ? 'bg-surface text-ok-ink' : 'bg-act text-on-act')}
           >
             {app.online ? <Wifi size={18} /> : <WifiOff size={18} />}
-            {app.online ? 'Conectado' : 'Sin internet'}
+            <span className="hidden min-[380px]:inline">{app.online ? 'Conectado' : 'Sin internet'}</span>
           </button>
-          <button onClick={() => app.setSheet({ kind: 'mine' })} className="grid h-12 w-12 place-items-center rounded-2xl bg-surface/95 text-ink shadow-card" aria-label="Menú">
-            <Menu size={22} />
+          <button onClick={() => app.setSheet({ kind: 'mine' })} className="flex h-12 items-center gap-1.5 rounded-lg bg-surface px-3 text-sm font-bold text-ink shadow-card" aria-label="Menú">
+            <Menu size={20} /> Menú
           </button>
         </div>
-        {topAlert && (
-          <button onClick={() => app.setSheet({ kind: 'alerts' })} className="mt-2 flex w-full items-center gap-3 rounded-2xl bg-surface/95 p-3 text-left shadow-card backdrop-blur lg:max-w-[420px]">
-            <AlertGlyph a={topAlert} />
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-[15px] font-bold">{topAlert.title}</div>
-              <div className="truncate text-sm text-ink-3">
-                {topAlert.location}. {topAlert.simulated ? 'Simulacro.' : ''}
+        {/* Un solo aviso a la vez, el más importante */}
+        <div className="lg:max-w-[420px]">
+          {!app.userPos && isInAppBrowser() ? (
+            <Notice icon={<LocateFixed size={20} />} title="Abre en el navegador" text="Aquí dentro no se puede usar tu ubicación." action="Abrir" onClick={openInSystemBrowser} />
+          ) : !app.userPos && app.locPerm !== 'granted' ? (
+            <Notice
+              icon={app.locating ? <Loader2 size={20} className="animate-spin" /> : <LocateFixed size={20} />}
+              title={app.locating ? 'Buscando tu ubicación…' : 'Activa tu ubicación'}
+              text="Así la ayuda sabe dónde estás."
+              action={app.locating ? undefined : 'Activar'}
+              onClick={async () => {
+                const p = await app.locate();
+                if (p) app.flyTo(p.lat, p.lng, 15);
+              }}
+            />
+          ) : topAlert ? (
+            <button onClick={() => app.setSheet({ kind: 'alerts' })} className="mt-2 flex w-full items-center gap-3 rounded-lg bg-surface p-2.5 text-left shadow-card">
+              <AlertGlyph a={topAlert} />
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[15px] font-bold">{topAlert.title}</div>
+                <div className="truncate text-sm text-ink-3">
+                  {topAlert.location}. {topAlert.simulated ? 'Simulacro.' : ''}
+                </div>
               </div>
-            </div>
-            <ChevronRight size={20} className="text-ink-3" />
-          </button>
-        )}
-        {!app.userPos && isInAppBrowser() && (
-          <button
-            onClick={openInSystemBrowser}
-            className="mt-2 flex w-full items-center gap-3 rounded-2xl bg-surface/95 px-3 py-2.5 text-left shadow-card backdrop-blur lg:max-w-[420px]"
-          >
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand">
-              <LocateFixed size={20} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[15px] font-bold">Abre en el navegador</span>
-              <span className="block truncate text-sm text-ink-3">Aquí dentro no se puede usar tu ubicación.</span>
-            </span>
-            <span className="rounded-xl bg-brand px-3 py-2 text-sm font-bold text-on-brand">Abrir</span>
-          </button>
-        )}
-        {!app.userPos && !isInAppBrowser() && app.locPerm !== 'granted' && (
-          <button
-            onClick={async () => {
-              const p = await app.locate();
-              if (p) app.flyTo(p.lat, p.lng, 15);
-            }}
-            className="mt-2 flex w-full items-center gap-3 rounded-2xl bg-surface/95 px-3 py-2.5 text-left shadow-card backdrop-blur lg:max-w-[420px]"
-          >
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand">
-              {app.locating ? <Loader2 size={20} className="animate-spin" /> : <LocateFixed size={20} />}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[15px] font-bold">{app.locating ? 'Buscando tu ubicación…' : 'Activa tu ubicación'}</span>
-              <span className="block truncate text-sm text-ink-3">Así la ayuda sabe dónde estás.</span>
-            </span>
-            {!app.locating && <span className="rounded-xl bg-brand px-3 py-2 text-sm font-bold text-on-brand">Activar</span>}
-          </button>
-        )}
-        {!app.profile && (
-          <button
-            onClick={() => app.setSheet({ kind: 'register' })}
-            className="mt-2 flex w-full items-center gap-3 rounded-2xl border-2 border-dashed border-brand/60 bg-surface/95 px-3 py-2.5 text-left shadow-card backdrop-blur lg:max-w-[420px]"
-          >
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand">
-              <IdCard size={20} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[15px] font-bold">Registra tu cédula</span>
-              <span className="block truncate text-sm text-ink-3">Es necesaria para enviar reportes. Toma 10 segundos.</span>
-            </span>
-            <span className="rounded-xl bg-brand px-3 py-2 text-sm font-bold text-on-brand">Registrar</span>
-          </button>
-        )}
+              <ChevronRight size={20} className="text-ink-3" />
+            </button>
+          ) : null}
+        </div>
       </header>
 
       <button
         onClick={locateMe}
-        className="absolute bottom-[calc(200px+var(--safe-b))] right-3 z-[600] lg:bottom-12 grid h-12 w-12 place-items-center rounded-2xl bg-surface text-ink shadow-card"
+        className="absolute bottom-[calc(var(--map-bottom)+16px)] right-3 z-[600] grid h-12 w-12 place-items-center rounded-lg bg-surface text-ink shadow-card lg:bottom-12"
         aria-label="Ver mi ubicación"
       >
         {locating ? <Loader2 size={22} className="animate-spin" /> : <LocateFixed size={22} />}
       </button>
 
-      {/* Panel inferior: una sola acción principal */}
-      <section className="absolute inset-x-0 bottom-0 z-[700] rounded-t-[28px] bg-surface px-4 pb-[calc(16px+var(--safe-b))] pt-4 shadow-float lg:inset-x-auto lg:bottom-4 lg:left-4 lg:w-[420px] lg:rounded-[28px]">
+      {/* Panel inferior: una acción principal y dos de apoyo */}
+      <section className="absolute inset-x-0 bottom-0 z-[700] rounded-t-[10px] border-t border-line bg-surface px-4 pb-[calc(14px+var(--safe-b))] pt-3 shadow-float lg:inset-x-auto lg:bottom-4 lg:left-4 lg:w-[420px] lg:rounded-[10px] lg:border">
         {latest ? (
-          <button onClick={() => app.setSheet({ kind: 'mine' })} className="mb-3 flex w-full items-center gap-3 rounded-2xl bg-surface-2 px-3 py-2.5 text-left">
+          <button onClick={() => app.setSheet({ kind: 'mine' })} className="mb-3 flex w-full items-center gap-3 rounded-lg bg-surface-2 px-3 py-2 text-left">
             <StatusDot inc={latest} />
             <div className="min-w-0 flex-1">
               <div className="truncate text-[15px] font-semibold">Tu reporte: {CITIZEN_LABEL[latest.category].toLowerCase()}</div>
@@ -149,30 +117,54 @@ export function CitizenApp() {
             </div>
             <ChevronRight size={18} className="text-ink-3" />
           </button>
-        ) : (
-          <p className="mb-3 px-1 text-base text-ink-2">¿Ves una emergencia o necesitas ayuda?</p>
-        )}
+        ) : !app.profile ? (
+          <button onClick={() => app.setSheet({ kind: 'register' })} className="mb-3 flex w-full items-center gap-3 rounded-lg border-2 border-dashed border-brand/50 px-3 py-2 text-left">
+            <IdCard size={22} className="shrink-0 text-brand" />
+            <span className="min-w-0 flex-1 text-[15px] leading-tight">
+              <span className="font-bold">Registra tu cédula</span> <span className="text-ink-3">para poder enviar reportes</span>
+            </span>
+            <span className="shrink-0 rounded-md bg-brand px-3 py-1.5 text-sm font-bold text-on-brand">Registrar</span>
+          </button>
+        ) : null}
         <button
           onClick={() => {
             app.select(null);
             setReporting(true);
           }}
-          className="breathe flex min-h-[72px] w-full items-center justify-center gap-3 rounded-[22px] bg-act text-on-act shadow-float transition active:scale-[.98]"
+          className="breathe flex min-h-[76px] w-full items-center justify-center gap-3 rounded-[8px] bg-act px-4 text-on-act transition active:scale-[.98]"
         >
-          <Siren size={28} strokeWidth={2.2} />
-          <span className="font-display text-[28px] font-bold leading-none">Reportar emergencia</span>
+          <Siren size={30} strokeWidth={2.2} />
+          <span className="text-left">
+            <span className="block font-display text-[28px] font-bold leading-none">Reportar emergencia</span>
+            <span className="mt-1 block text-sm font-semibold opacity-80">Funciona aunque no tengas internet</span>
+          </span>
         </button>
-        <p className="mt-3 text-center text-sm text-ink-3">
-          Funciona sin internet. Peligro inmediato:{' '}
-          <a className="font-bold text-ink underline" href="tel:123">
-            llama al 123
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          <a href="tel:123" className="flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-crit text-base font-bold text-white">
+            <Phone size={19} /> Llamar al 123
           </a>
-        </p>
+          <button onClick={() => app.setSheet({ kind: 'alerts' })} className="flex min-h-[52px] items-center justify-center gap-2 rounded-lg border-2 border-line text-base font-bold text-ink">
+            <BellRing size={19} /> Alertas{app.alerts.length ? <span className="rounded-sm bg-ink px-1.5 font-data text-xs text-paper">{app.alerts.length}</span> : null}
+          </button>
+        </div>
       </section>
 
       {selected && !reporting && <CitizenIncidentSheet inc={selected} />}
       {reporting && <ReportFlow onClose={() => setReporting(false)} />}
     </div>
+  );
+}
+
+function Notice({ icon, title, text, action, onClick }: { icon: React.ReactNode; title: string; text: string; action?: string; onClick: () => void }) {
+  return (
+    <button onClick={onClick} className="mt-2 flex w-full items-center gap-3 rounded-lg bg-surface px-2.5 py-2 text-left shadow-card">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-brand-soft text-brand">{icon}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[15px] font-bold">{title}</span>
+        <span className="block truncate text-sm text-ink-3">{text}</span>
+      </span>
+      {action && <span className="rounded-md bg-brand px-3 py-2 text-sm font-bold text-on-brand">{action}</span>}
+    </button>
   );
 }
 
@@ -193,7 +185,7 @@ export function citizenStatus(inc: Incident, online: boolean) {
 function StatusDot({ inc }: { inc: Incident }) {
   const done = inc.transmission === 'recibido_central' || inc.attention !== 'pendiente';
   return (
-    <span className={cx('grid h-10 w-10 shrink-0 place-items-center rounded-full', done ? 'bg-ok-soft text-ok-ink' : 'bg-high-soft text-high-ink')}>
+    <span className={cx('grid h-10 w-10 shrink-0 place-items-center rounded-md', done ? 'bg-ok-soft text-ok-ink' : 'bg-high-soft text-high-ink')}>
       {done ? <Check size={20} strokeWidth={3} /> : <WifiOff size={18} />}
     </span>
   );

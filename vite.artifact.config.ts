@@ -6,6 +6,7 @@ import { viteSingleFile } from 'vite-plugin-singlefile';
 export default defineConfig({
   plugins: [react(), viteSingleFile()],
   base: './',
+  resolve: { alias: { 'vosk-browser': new URL('./src/lib/vosk-stub.ts', import.meta.url).pathname } },
   define: { 'import.meta.env.VITE_SINGLEFILE': JSON.stringify('1') },
   build: { outDir: 'dist-artifact', assetsInlineLimit: 100_000_000, cssCodeSplit: false, chunkSizeWarningLimit: 5000 },
 });

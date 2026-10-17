@@ -1,6 +1,6 @@
 /* NexoRescate service worker — app shell offline. Las teselas del mapa se gestionan
    desde la app con Cache API (caché "nr-tiles-v1"), que este SW no borra. */
-const SHELL = 'nr-shell-v3';
+const SHELL = 'nr-shell-v4';
 const CORE = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon.svg', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -24,6 +24,7 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return; // teselas, USGS y Nominatim: los maneja la app
+  if (url.pathname.startsWith('/models/')) return; // modelo de voz: lo guarda la app en «nr-voice-v1»
 
   if (req.mode === 'navigate') {
     e.respondWith(

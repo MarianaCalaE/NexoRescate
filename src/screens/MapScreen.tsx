@@ -78,25 +78,25 @@ export function MapScreen({ visible }: { visible: boolean }) {
               <button
                 onClick={() => setShowFilters(true)}
                 className={cx(
-                  'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-bold shadow-card',
+                  'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md px-3 text-xs font-bold shadow-card',
                   activeFilterCount ? 'bg-brand text-on-brand' : 'bg-surface text-ink',
                 )}
               >
                 <SlidersHorizontal size={14} /> Filtros{activeFilterCount ? ` (${activeFilterCount})` : ''}
               </button>
               {(['critica', 'alta', 'pendiente_verificacion', 'moderada'] as DisplayLevel[]).map((lv) => (
-                <span key={lv} className="shadow-card rounded-full">
+                <span key={lv} className="shadow-card rounded-md">
                   <Chip active={filters.levels.includes(lv)} onClick={() => quick(lv)} color={LEVEL_META[lv].color}>
                     {lv === 'pendiente_verificacion' ? 'Por verificar' : LEVEL_META[lv].label}
                   </Chip>
                 </span>
               ))}
-              <span className="shadow-card rounded-full">
+              <span className="shadow-card rounded-md">
                 <Chip active={filters.status === 'resueltos'} onClick={() => setFilters((f) => ({ ...f, status: f.status === 'resueltos' ? 'activos' : 'resueltos' }))} color="#16A34A">
                   Atendidos
                 </Chip>
               </span>
-              <span className="shadow-card rounded-full">
+              <span className="shadow-card rounded-md">
                 <Chip active={filters.mine} onClick={() => setFilters((f) => ({ ...f, mine: !f.mine, status: 'todos' }))} color="#2563EB">
                   Míos
                 </Chip>
@@ -126,15 +126,15 @@ export function MapScreen({ visible }: { visible: boolean }) {
           {/* Contador + sin ubicación */}
           {!selected && (
             <div className="absolute inset-x-3 bottom-[calc(84px+var(--safe-b))] z-[500] flex flex-wrap items-center gap-2 lg:bottom-[calc(96px)] lg:left-3 lg:right-auto lg:w-[420px]">
-              <span className="rounded-full bg-surface/95 px-3 py-1.5 text-xs font-bold text-ink shadow-card">
+              <span className="rounded-md bg-surface px-3 py-1.5 text-xs font-bold text-ink shadow-card">
                 {filtered.length} en el mapa, <span className="text-crit-ink">{filtered.filter((i) => app.assessments.get(i.id)?.display === 'critica').length} críticos</span>
               </span>
               {withoutLocation.length > 0 && (
-                <button onClick={() => setNoLoc(true)} className="inline-flex items-center gap-1 rounded-full bg-surface/95 px-3 py-1.5 text-xs font-bold text-verify-ink shadow-card">
+                <button onClick={() => setNoLoc(true)} className="inline-flex items-center gap-1 rounded-md bg-surface px-3 py-1.5 text-xs font-bold text-verify-ink shadow-card">
                   <MapPinOff size={13} /> {withoutLocation.length} sin ubicación
                 </button>
               )}
-              <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-warn-soft px-2.5 py-1.5 text-[10px] font-bold text-warn-ink shadow-card">
+              <span className="ml-auto inline-flex items-center gap-1 rounded-md bg-warn-soft px-2.5 py-1.5 text-[10px] font-bold text-warn-ink shadow-card">
                 Escenario ficticio
               </span>
             </div>
@@ -210,7 +210,7 @@ function SelectedCard({ inc }: { inc: Incident }) {
             <MapPin size={12} /> <span className="truncate">{inc.locationLabel}, {inc.municipality}</span>
           </div>
         </div>
-        <button onClick={() => app.select(null)} className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-surface-2 text-ink-3" aria-label="Cerrar">
+        <button onClick={() => app.select(null)} className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-surface-2 text-ink-3" aria-label="Cerrar">
           <X size={16} />
         </button>
       </div>
@@ -479,9 +479,9 @@ function LayersSheet({ map, onClose }: { map: L.Map | null; onClose: () => void 
               app.saveSettings({ showUsgs: !app.settings.showUsgs });
               if (!app.settings.showUsgs && app.usgs.items.length === 0) app.loadUsgs();
             }}
-            className={cx('relative h-7 w-12 rounded-full transition', app.settings.showUsgs ? 'bg-brand' : 'bg-line')}
+            className={cx('relative h-7 w-12 rounded-md transition', app.settings.showUsgs ? 'bg-brand' : 'bg-line')}
           >
-            <span className={cx('absolute top-1 h-5 w-5 rounded-full bg-surface transition', app.settings.showUsgs ? 'left-6' : 'left-1')} />
+            <span className={cx('absolute top-1 h-5 w-5 rounded-md bg-surface transition', app.settings.showUsgs ? 'left-6' : 'left-1')} />
           </button>
         </div>
       </div>
@@ -496,7 +496,7 @@ function LayersSheet({ map, onClose }: { map: L.Map | null; onClose: () => void 
         </p>
         {progress ? (
           <div className="mt-3">
-            <div className="h-2 overflow-hidden rounded-full bg-surface">
+            <div className="h-2 overflow-hidden rounded-md bg-surface">
               <div className="h-full bg-brand transition-all" style={{ width: `${(progress.done / progress.total) * 100}%` }} />
             </div>
             <div className="mt-1 text-xs text-ink-3">

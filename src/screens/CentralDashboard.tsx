@@ -148,12 +148,12 @@ export function CentralDashboard() {
 
 function MapLegend() {
   return (
-    <div className="absolute bottom-3 left-3 z-[500] rounded-2xl bg-surface/95 p-3 text-xs shadow-card backdrop-blur">
+    <div className="absolute bottom-3 left-3 z-[500] rounded-2xl bg-surface p-3 text-xs shadow-card">
       <div className="mb-1.5 font-semibold text-ink-2">Prioridad</div>
       <ul className="space-y-1">
         {(['critica', 'alta', 'pendiente_verificacion', 'moderada', 'baja'] as DisplayLevel[]).map((l) => (
           <li key={l} className="flex items-center gap-2">
-            <span className="grid h-4 min-w-4 place-items-center rounded-full px-1 font-data text-[10px] font-bold" style={{ background: LEVEL_META[l].color, color: ['moderada', 'alta', 'atendido'].includes(l) ? '#241034' : '#fff' }}>
+            <span className="grid h-4 min-w-4 place-items-center rounded-md px-1 font-data text-[10px] font-bold" style={{ background: LEVEL_META[l].color, color: ['moderada', 'alta', 'atendido'].includes(l) ? '#241034' : '#fff' }}>
               {LEVEL_META[l].glyph}
             </span>
             {LEVEL_META[l].label}
@@ -177,7 +177,7 @@ function LayerSwitch() {
     ['local', 'Offline'],
   ];
   return (
-    <div className="absolute right-3 top-3 z-[500] flex items-center gap-1 rounded-2xl bg-surface/95 p-1 shadow-card backdrop-blur">
+    <div className="absolute right-3 top-3 z-[500] flex items-center gap-1 rounded-2xl bg-surface p-1 shadow-card">
       <Layers size={16} className="mx-1.5 text-ink-3" />
       {opts.map(([id, l]) => (
         <button
@@ -371,7 +371,7 @@ function CasePanel({ inc }: { inc: Incident }) {
         <LevelBadge level={a.display} size="sm" />
         <VerifBadge v={inc.verification} />
         <AttnBadge a={inc.attention} />
-        {dups > 0 && <span className="rounded-full bg-surface-2 px-2 py-0.5 text-xs font-semibold leading-5">{dups + 1} reportes agrupados</span>}
+        {dups > 0 && <span className="rounded-md bg-surface-2 px-2 py-0.5 text-xs font-semibold leading-5">{dups + 1} reportes agrupados</span>}
       </div>
 
       <p className="mt-3 text-[15px] leading-relaxed">{inc.description}</p>

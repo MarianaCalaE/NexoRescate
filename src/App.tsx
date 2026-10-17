@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { AppProvider, useApp } from './store';
 import { CitizenApp, CitizenMenu, CitizenAlerts, AccessSheet } from './screens/CitizenApp';
@@ -10,6 +10,7 @@ import { SmsSheet, LoraSheet, OfflinePanel, SettingsSheet } from './screens/Chan
 import { cx, ConfirmDialog } from './components/ui';
 import { RegisterSheet } from './screens/Register';
 import { LocationHelpSheet } from './screens/LocationHelp';
+import { Welcome } from './screens/Welcome';
 
 export default function App() {
   return (
@@ -23,10 +24,14 @@ function Shell() {
   const app = useApp();
   const role = app.session.role;
   const theme = role === 'ciudadano' ? 'citizen' : 'ops';
+  // Pantalla de inicio en cada apertura. Los enlaces directos (#central, #rescatista, #ciudadano) entran sin ella.
+  const [entered, setEntered] = useState(() => /^#(central|rescatista|ciudadano)$/.test(location.hash));
+  const enteredRef = useRef(entered);
+  enteredRef.current = entered;
 
   useEffect(() => {
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'ops' ? '#180D22' : '#F7F4FA');
-  }, [theme]);
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'ops' && entered ? '#180D22' : '#F7F4FA');
+  }, [theme, entered]);
 
   // Atajos de demostración: #central o #rescatista
   useEffect(() => {
@@ -88,6 +93,10 @@ function Shell() {
         a.select(null);
         return;
       }
+      if (enteredRef.current) {
+        setEntered(false);
+        return;
+      }
       const ok = await a.askConfirm({
         title: '¿Quieres salir de NexoRescate?',
         body: pendingRef.current
@@ -142,6 +151,7 @@ function Shell() {
         />
       )}
 
+      {!entered && <Welcome onEnter={() => setEntered(true)} />}
       <Toasts />
     </div>
   );

@@ -4,6 +4,7 @@ import { useApp } from '../store';
 import { CAT } from '../data/categories';
 import { CITIZEN_LABEL, PRIMARY_CATS, MORE_CATS, SAFETY_TIP, AFFECTED_OPTIONS } from '../data/safety';
 import { reverseGeocode, searchLocal, searchNominatim, type GeoResult } from '../services/geo';
+import { VoiceDictation } from '../components/VoiceDictation';
 import { MapView } from '../components/MapView';
 import { Btn, cx, TxBadge, timeAgo, SimTag } from '../components/ui';
 import type { Incident, CategoryId } from '../types';
@@ -161,7 +162,7 @@ export function ReportFlow({ onClose }: { onClose: () => void }) {
       {step !== 'listo' && (
         <div className="flex items-center gap-2 px-4 pb-2 pt-[calc(12px+var(--safe-t))]">
           {stepIdx > 0 ? (
-            <button onClick={back} className="grid h-12 w-12 place-items-center rounded-full bg-surface text-ink shadow-card" aria-label="Volver">
+            <button onClick={back} className="grid h-12 w-12 place-items-center rounded-md bg-surface text-ink shadow-card" aria-label="Volver">
               <ArrowLeft size={22} />
             </button>
           ) : (
@@ -169,10 +170,10 @@ export function ReportFlow({ onClose }: { onClose: () => void }) {
           )}
           <div className="flex flex-1 justify-center gap-1.5" aria-label={`Paso ${stepIdx + 1} de 3`}>
             {[0, 1, 2].map((k) => (
-              <span key={k} className={cx('h-2 rounded-full transition-all', k === stepIdx ? 'w-8 bg-ink' : k < stepIdx ? 'w-2 bg-ink' : 'w-2 bg-line')} />
+              <span key={k} className={cx('h-2 rounded-md transition-all', k === stepIdx ? 'w-8 bg-ink' : k < stepIdx ? 'w-2 bg-ink' : 'w-2 bg-line')} />
             ))}
           </div>
-          <button onClick={close} className="grid h-12 w-12 place-items-center rounded-full bg-surface text-ink-2 shadow-card" aria-label="Cancelar reporte">
+          <button onClick={close} className="grid h-12 w-12 place-items-center rounded-md bg-surface text-ink-2 shadow-card" aria-label="Cancelar reporte">
             <X size={22} />
           </button>
         </div>
@@ -250,7 +251,7 @@ export function ReportFlow({ onClose }: { onClose: () => void }) {
             )}
           </div>
 
-          <div className="relative mx-3 min-h-[140px] flex-1 overflow-hidden rounded-[24px] border border-line">
+          <div className="relative mx-3 min-h-[140px] flex-1 overflow-hidden rounded-[10px] border border-line">
             <MapView incidents={[]} variant="citizen" baseLayer={app.settings.baseLayer} />
           </div>
 
@@ -295,8 +296,14 @@ export function ReportFlow({ onClose }: { onClose: () => void }) {
               ))}
             </div>
 
-            <label className="mt-6 block">
-              <span className="text-base font-semibold">¿Algo más que debamos saber? (opcional)</span>
+            <div className="mt-6">
+              <span className="block text-base font-semibold">¿Algo más? Dilo o escríbelo (opcional)</span>
+              <div className="mt-2">
+                <VoiceDictation value={d.description} onChange={(v) => app.setDraft({ description: v })} />
+              </div>
+            </div>
+            <label className="mt-2 block">
+              <span className="sr-only">Detalles del reporte</span>
               <textarea
                 value={d.description}
                 maxLength={280}
@@ -381,7 +388,7 @@ export function ReportFlow({ onClose }: { onClose: () => void }) {
 
       {dupAsk && (
         <div className="fixed inset-0 z-[950] flex items-end bg-[rgb(6_20_24/.5)] fade-in sm:items-center sm:justify-center">
-          <div className="sheet-enter w-full rounded-t-[28px] bg-surface p-5 pb-[calc(20px+var(--safe-b))] sm:max-w-md sm:rounded-[28px]">
+          <div className="sheet-enter w-full rounded-t-[10px] bg-surface p-5 pb-[calc(20px+var(--safe-b))] sm:max-w-md sm:rounded-[10px]">
             <h2 className="font-display text-[28px] font-bold leading-tight">Alguien ya reportó algo parecido aquí</h2>
             <p className="mt-2 text-base text-ink-2">
               {CITIZEN_LABEL[dupAsk[0].category]}, {timeAgo(dupAsk[0].createdAt)}. ¿Es la misma emergencia?
@@ -401,10 +408,10 @@ export function ReportFlow({ onClose }: { onClose: () => void }) {
 
       {askDoc && (
         <div className="fixed inset-0 z-[950] flex items-end bg-[rgb(6_20_24/.5)] fade-in sm:items-center sm:justify-center">
-          <div className="sheet-enter max-h-[94dvh] w-full overflow-y-auto rounded-t-[28px] bg-surface p-5 pb-[calc(20px+var(--safe-b))] sm:max-w-md sm:rounded-[28px]">
+          <div className="sheet-enter max-h-[94dvh] w-full overflow-y-auto rounded-t-[10px] bg-surface p-5 pb-[calc(20px+var(--safe-b))] sm:max-w-md sm:rounded-[10px]">
             <div className="flex items-start gap-3">
               <h2 className="flex-1 font-display text-[28px] font-bold leading-tight">Antes de enviar: tu cédula</h2>
-              <button onClick={() => setAskDoc(null)} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-surface-2 text-ink-2" aria-label="Volver al reporte">
+              <button onClick={() => setAskDoc(null)} className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-surface-2 text-ink-2" aria-label="Volver al reporte">
                 <X size={20} />
               </button>
             </div>
@@ -471,7 +478,7 @@ function AddressInput({ value, onChange, onPick }: { value: string; onChange: (v
         />
         {busy && <Loader2 size={18} className="shrink-0 animate-spin text-ink-3" />}
         {value && (
-          <button onClick={() => onChange('')} className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-3" aria-label="Borrar dirección">
+          <button onClick={() => onChange('')} className="grid h-9 w-9 shrink-0 place-items-center rounded-md text-ink-3" aria-label="Borrar dirección">
             <X size={18} />
           </button>
         )}
@@ -512,7 +519,7 @@ function CatTile({ id, onClick, selected, small }: { id: CategoryId; onClick: ()
     <button
       onClick={onClick}
       className={cx(
-        'flex flex-col items-start justify-between gap-3 rounded-[22px] border-2 bg-surface p-4 text-left transition active:scale-[.97]',
+        'flex flex-col items-start justify-between gap-3 rounded-[8px] border-2 bg-surface p-4 text-left transition active:scale-[.97]',
         small ? 'min-h-[104px]' : 'min-h-[128px]',
         selected ? 'border-ink' : 'border-transparent shadow-card',
       )}
@@ -536,7 +543,7 @@ function Done({ inc, onClose, ops }: { inc: Incident; onClose: () => void; ops: 
   if (!offline)
     return (
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 pb-[calc(20px+var(--safe-b))] pt-[calc(40px+var(--safe-t))]">
-        <div className={cx('grid h-20 w-20 place-items-center rounded-full', received ? 'bg-ok text-on-ok' : 'bg-brand-soft text-brand')}>
+        <div className={cx('grid h-20 w-20 place-items-center rounded-md', received ? 'bg-ok text-on-ok' : 'bg-brand-soft text-brand')}>
           {received ? <Check size={44} strokeWidth={3} /> : <Loader2 size={36} className="animate-spin" />}
         </div>
         <h1 className="mt-5 font-display text-[38px] font-bold leading-[1.05]">{received ? 'Recibimos tu reporte' : 'Enviando tu reporte…'}</h1>
@@ -557,7 +564,7 @@ function Done({ inc, onClose, ops }: { inc: Incident; onClose: () => void; ops: 
       <p className="mt-2 text-lg text-ink-2">No hay internet. Envíalo ahora por SMS: funciona con señal de celular, sin datos.</p>
 
       {smsSent ? (
-        <div className="mt-5 flex items-center gap-3 rounded-[22px] bg-ok-soft p-4 text-ok-ink">
+        <div className="mt-5 flex items-center gap-3 rounded-[8px] bg-ok-soft p-4 text-ok-ink">
           <Check size={28} strokeWidth={3} className="shrink-0" />
           <div>
             <div className="text-lg font-bold">Reporte enviado por SMS</div>
@@ -570,7 +577,7 @@ function Done({ inc, onClose, ops }: { inc: Incident; onClose: () => void; ops: 
         </Btn>
       )}
 
-      <ul className="mt-4 divide-y divide-line rounded-[22px] border border-line bg-surface" aria-label="Canales de envío">
+      <ul className="mt-4 divide-y divide-line rounded-[8px] border border-line bg-surface" aria-label="Canales de envío">
         <ChannelRow
           icon={<Radio size={20} />}
           title="Radio comunitaria (LoRa)"
@@ -646,7 +653,7 @@ function Code({ inc, ops }: { inc: Incident; ops: boolean }) {
 
 function Tip({ tip }: { tip: string }) {
   return (
-    <div className="mt-5 rounded-[22px] bg-surface p-4 shadow-card">
+    <div className="mt-5 rounded-[8px] bg-surface p-4 shadow-card">
       <div className="text-base font-bold">Mientras llega la ayuda</div>
       <p className="mt-1 text-[17px] leading-relaxed text-ink-2">{tip}</p>
     </div>

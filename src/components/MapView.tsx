@@ -435,7 +435,7 @@ export function MapView({
     <div className="relative h-full w-full">
       <div ref={el} className="nr-map h-full w-full" role="application" aria-label="Mapa interactivo de incidentes" />
       {simple && baseLayer !== 'local' && (
-        <div className="pointer-events-none absolute bottom-[calc(var(--map-bottom)+26px)] left-2 z-[450] rounded-lg bg-surface/90 px-2 py-1 text-xs font-semibold text-ink-2 shadow-card">
+        <div className="pointer-events-none absolute bottom-[calc(var(--map-bottom)+26px)] left-2 z-[450] rounded-lg bg-surface px-2 py-1 text-xs font-semibold text-ink-2 shadow-card">
           Mapa sin conexión: vista simplificada
         </div>
       )}

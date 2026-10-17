@@ -23,7 +23,7 @@ export function RescuerApp() {
       <MapScreen visible={app.tab === 'mapa'} />
 
       <header className="absolute inset-x-0 top-0 z-[700] px-3 pt-[calc(8px+var(--safe-t))] lg:left-3 lg:right-auto lg:top-3 lg:w-[420px] lg:px-0 lg:pt-0">
-        <div className="flex h-12 items-center gap-2 rounded-2xl bg-surface/95 px-1.5 shadow-card backdrop-blur">
+        <div className="flex h-12 items-center gap-2 rounded-2xl bg-surface px-1.5 shadow-card">
           <LogoBadge dark />
           <div className="min-w-0 flex-1 leading-tight">
             <div className="truncate text-[15px] font-bold">{unit?.name ?? 'Rescatista'}</div>
@@ -98,7 +98,7 @@ function NavItem({ t, label, Icon, badge }: { t: Tab; label: string; Icon: typeo
     >
       <Icon size={22} strokeWidth={on ? 2.5 : 2} />
       {label}
-      {!!badge && <span className="absolute right-[calc(50%-22px)] top-1.5 rounded-full bg-act px-1.5 font-data text-[11px] text-on-act">{badge}</span>}
+      {!!badge && <span className="absolute right-[calc(50%-22px)] top-1.5 rounded-md bg-act px-1.5 font-data text-[11px] text-on-act">{badge}</span>}
     </button>
   );
 }

@@ -209,7 +209,7 @@ export function LoraSheet({ id }: { id?: string }) {
             </div>
           </div>
           {status === 'conectado' ? (
-            <button onClick={disconnect} className="grid h-10 w-10 place-items-center rounded-full bg-on-brand/10" aria-label="Desconectar">
+            <button onClick={disconnect} className="grid h-10 w-10 place-items-center rounded-md bg-on-brand/10" aria-label="Desconectar">
               <Unplug size={18} />
             </button>
           ) : (
@@ -269,7 +269,7 @@ export function LoraSheet({ id }: { id?: string }) {
                   {m.direction === 'tx' ? <ArrowUpRight size={16} className="text-brand" /> : <ArrowDownLeft size={16} className="text-ok-ink" />}
                   <span className="font-data tnum text-xs font-bold">{m.id}</span>
                   <span className="text-[11px] text-ink-3">{m.incidentId}</span>
-                  <span className={cx('ml-auto inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold', S.c)}>
+                  <span className={cx('ml-auto inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold', S.c)}>
                     <I size={11} className={m.status === 'entregado_al_nodo' ? 'animate-spin' : ''} /> {S.t}
                   </span>
                 </div>

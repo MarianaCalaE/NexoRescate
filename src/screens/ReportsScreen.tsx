@@ -81,7 +81,7 @@ export function ReportsScreen() {
             <Select value={verif} onChange={setVerif} label="Verificación" options={Object.entries(VERIF_LABEL)} />
             <Select value={tx} onChange={setTx} label="Transmisión" options={Object.entries(TX_LABEL)} />
             {view === 'prioridad' && (
-              <button onClick={() => setShowDone(!showDone)} className={cx('h-9 shrink-0 rounded-full border px-3 text-sm font-semibold', showDone ? 'border-ink bg-ink text-paper' : 'border-line text-ink-2')}>
+              <button onClick={() => setShowDone(!showDone)} className={cx('h-9 shrink-0 rounded-md border px-3 text-sm font-semibold', showDone ? 'border-ink bg-ink text-paper' : 'border-line text-ink-2')}>
                 Incluir resueltos
               </button>
             )}
@@ -126,7 +126,7 @@ export function ReportsScreen() {
                     <span className="font-data tnum">{o.opId}</span>, versión {o.version}, {fmtDate(o.createdAt)}, {o.attempts} intento(s)
                   </div>
                 </div>
-                <span className={cx('rounded-full px-2 py-0.5 text-xs font-semibold', o.status === 'sincronizado' ? 'bg-ok-soft text-ok-ink' : o.status === 'error' ? 'bg-crit-soft text-crit-ink' : 'bg-high-soft text-high-ink')}>
+                <span className={cx('rounded-md px-2 py-0.5 text-xs font-semibold', o.status === 'sincronizado' ? 'bg-ok-soft text-ok-ink' : o.status === 'error' ? 'bg-crit-soft text-crit-ink' : 'bg-high-soft text-high-ink')}>
                   {o.status === 'sincronizado' ? 'Sincronizado' : o.status === 'pendiente' ? 'Pendiente' : o.status === 'enviando' ? 'Enviando' : 'Error'}
                 </span>
               </div>
@@ -188,7 +188,7 @@ export function CaseRow({ inc, km, compact }: { inc: Incident; km?: number | nul
             <div className="mt-2 flex flex-wrap gap-1">
               <AttnBadge a={inc.attention} />
               <VerifBadge v={inc.verification} />
-              {unit && <span className="inline-flex rounded-full bg-brand-soft px-2 py-0.5 text-xs font-semibold leading-5 text-ink">{unit.short}: {unit.name.split('·')[0].trim()}</span>}
+              {unit && <span className="inline-flex rounded-md bg-brand-soft px-2 py-0.5 text-xs font-semibold leading-5 text-ink">{unit.short}: {unit.name.split('·')[0].trim()}</span>}
               {inc.transmission !== 'recibido_central' && <TxBadge inc={inc} />}
             </div>
           )}
@@ -204,7 +204,7 @@ function Select({ value, onChange, label, options }: { value: string; onChange: 
       value={value}
       onChange={(e) => onChange(e.target.value)}
       aria-label={label}
-      className={cx('h-9 shrink-0 rounded-full border px-3 text-sm font-semibold', value ? 'border-ink bg-ink text-paper' : 'border-line bg-surface text-ink-2')}
+      className={cx('h-9 shrink-0 rounded-md border px-3 text-sm font-semibold', value ? 'border-ink bg-ink text-paper' : 'border-line bg-surface text-ink-2')}
     >
       <option value="">{label}</option>
       {options.map(([k, l]) => (
