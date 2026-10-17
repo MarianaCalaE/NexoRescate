@@ -164,6 +164,9 @@ button { touch-action: manipulation; }
 .nr-town span.referencia { font-size: 11px; font-weight: 600; color: rgb(var(--ink-2)); }
 .nr-map[data-simple='true'] { background: var(--map-sea); }
 
+/* Mapa de calles convertido a nocturno (respaldo del modo Noche) */
+.nr-dark-tiles { filter: invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.6); }
+
 /* Cartografía local (Natural Earth) */
 .nr-k-pais { fill: #EAE3F1; stroke: #B9A9CB; }
 .nr-k-choco { fill: #FBF9FD; stroke: #621091; }

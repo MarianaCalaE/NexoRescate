@@ -12,30 +12,35 @@ export interface BaseLayerDef {
   maxZoom: number;
   attribution: string;
   /** Proveedores alternos si el principal no responde (p. ej. el archivo se abrió sin servidor web). */
-  fallbacks?: { url: string; subdomains?: string; attribution: string }[];
+  fallbacks?: { url: string; subdomains?: string; attribution: string; tileClass?: string }[];
+  tileClass?: string;
 }
 
 const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
-const CARTO_ATTR = `${OSM_ATTR} &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>`;
 const ESRI_ATTR = 'Mapa &copy; Esri';
+const OSM_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const ESRI_STREET = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
+const ESRI_DARK = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
 
-/*
- * Proveedor principal + alternos. OpenStreetMap exige que la página tenga dirección web (Referer):
- * si el HTML se abre con doble clic (file://) rechaza las teselas. CARTO y Esri no lo exigen,
- * por eso van primero o como respaldo automático.
+/**
+ * Proveedores sin clave de API. OpenStreetMap exige que la página tenga dirección web (Referer):
+ * funciona en Vercel o localhost, pero no al abrir el HTML con doble clic (file://). En ese caso
+ * se usa Esri primero. CARTO se retiró porque ahora exige clave y marca las teselas con
+ * «API KEY REQUIRED». Para producción conviene un proveedor con clave propia o teselas propias.
  */
+const IS_FILE = typeof location !== 'undefined' && location.protocol === 'file:';
+const OSM = { url: OSM_URL, attribution: OSM_ATTR };
+const ESRI = { url: ESRI_STREET, attribution: ESRI_ATTR };
+const [STREET_MAIN, STREET_ALT] = IS_FILE ? [ESRI, OSM] : [OSM, ESRI];
+
 export const BASE_LAYERS: BaseLayerDef[] = [
   {
     id: 'calles',
     label: 'Calles',
-    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
-    subdomains: 'abcd',
+    url: STREET_MAIN.url,
     maxZoom: 19,
-    attribution: CARTO_ATTR,
-    fallbacks: [
-      { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', attribution: ESRI_ATTR },
-      { url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: OSM_ATTR },
-    ],
+    attribution: STREET_MAIN.attribution,
+    fallbacks: [STREET_ALT],
   },
   {
     id: 'satelite',
@@ -56,11 +61,11 @@ export const BASE_LAYERS: BaseLayerDef[] = [
   {
     id: 'oscuro',
     label: 'Noche',
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-    subdomains: 'abcd',
-    maxZoom: 19,
-    attribution: CARTO_ATTR,
-    fallbacks: [{ url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', attribution: ESRI_ATTR }],
+    // Mapa nocturno de Esri; si no responde, el mapa de calles con un filtro oscuro.
+    url: ESRI_DARK,
+    maxZoom: 16,
+    attribution: ESRI_ATTR,
+    fallbacks: [{ ...STREET_MAIN, tileClass: 'nr-dark-tiles' }, { ...STREET_ALT, tileClass: 'nr-dark-tiles' }],
   },
   {
     id: 'local',

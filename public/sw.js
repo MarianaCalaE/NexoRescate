@@ -1,6 +1,6 @@
 /* NexoRescate service worker — app shell offline. Las teselas del mapa se gestionan
    desde la app con Cache API (caché "nr-tiles-v1"), que este SW no borra. */
-const SHELL = 'nr-shell-v2';
+const SHELL = 'nr-shell-v3';
 const CORE = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon.svg', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {

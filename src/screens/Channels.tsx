@@ -441,7 +441,7 @@ export function SettingsSheet() {
       )}
       <p className="text-[15px] text-ink-2">Prototipo para el Rally Latinoamericano de Innovación. No es un sistema certificado de respuesta a emergencias. En una emergencia real llama al 123.</p>
       <dl className="mt-4 divide-y divide-line rounded-2xl border border-line text-sm">
-        <Line k="Mapa" v="OpenStreetMap, Esri, OpenTopoMap y CARTO, con copia en el dispositivo" />
+        <Line k="Mapa" v="OpenStreetMap, Esri y OpenTopoMap, con copia en el dispositivo" />
         <Line k="Mapa sin internet" v="Natural Earth y zonas guardadas" />
         <Line k="Sismos reales" v="USGS, opcional" />
         <Line k="Incidentes y alertas" v="Ficticios, para la demostración" />

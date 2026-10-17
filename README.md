@@ -50,7 +50,7 @@ El mapa usa **Leaflet** con cartografía real y coordenadas WGS84 reales:
 
 | Capa | Fuente | Requiere internet |
 |---|---|---|
-| Calles | OpenStreetMap vía CARTO (respaldo: Esri, OSM directo) | Sí (con caché) |
+| Calles | OpenStreetMap (respaldo: Esri; con doble clic sobre el HTML, Esri primero) | Sí (con caché) |
 | Satélite | Esri World Imagery + etiquetas | Sí (con caché) |
 | Relieve | Esri World Topo (respaldo: OpenTopoMap) | Sí (con caché) |
 | Local offline | Natural Earth (dominio público): países, departamentos, límite del Chocó, río Atrato, vías; ríos San Juan y Baudó trazados aproximados; cabeceras municipales | **No** |
@@ -64,7 +64,7 @@ El mapa usa **Leaflet** con cartografía real y coordenadas WGS84 reales:
 
 > Las políticas de OSM prohíben descargas masivas de teselas. Para producción se recomienda un servidor de teselas propio o un paquete offline PMTiles/MBTiles de la región.
 
-> Si un proveedor no responde, el mapa prueba automáticamente el siguiente y, si ninguno carga, pasa a la vista simplificada local. OpenStreetMap rechaza teselas cuando el HTML se abre con doble clic (sin dirección web), por eso CARTO y Esri van primero. La página publicada como artefacto bloquea servidores externos por seguridad: allí solo se ve la vista simplificada.
+> Si un proveedor no responde, el mapa prueba automáticamente el siguiente y, si ninguno carga, pasa a la vista simplificada local. OpenStreetMap rechaza teselas cuando el HTML se abre con doble clic (sin dirección web), por eso ahí Esri va primero. CARTO se retiró porque ahora exige clave de API. La página publicada como artefacto bloquea servidores externos por seguridad: allí solo se ve la vista simplificada.
 
 ## Arquitectura
 

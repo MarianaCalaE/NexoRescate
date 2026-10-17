@@ -229,7 +229,7 @@ export function MapView({
     layers.current.base = layers.current.labels = undefined;
     const base = BASE_LAYERS.find((b) => b.id === baseId)!;
     const alt = provider > 0 ? base.fallbacks?.[provider - 1] : undefined;
-    const def = alt ? { ...base, url: alt.url, subdomains: alt.subdomains, attribution: alt.attribution, labelsUrl: base.labelsUrl } : base;
+    const def = alt ? { ...base, url: alt.url, subdomains: alt.subdomains, attribution: alt.attribution, labelsUrl: base.labelsUrl, tileClass: alt.tileClass, maxZoom: alt.tileClass ? 19 : base.maxZoom } : base;
     const hasNext = !offline && provider < (base.fallbacks?.length ?? 0);
     el.current!.dataset.base = baseId;
     el.current!.dataset.offline = String(offline);
@@ -242,6 +242,7 @@ export function MapView({
         cacheOnly: offline,
         crossOrigin: true,
         keepBuffer: 3,
+        className: def.tileClass ?? '',
       }).addTo(m);
       // Si las teselas no cargan (sin internet o bloqueadas), pasar a la vista simplificada local.
       let errors = 0;

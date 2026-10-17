@@ -451,7 +451,7 @@ function LayersSheet({ map, onClose }: { map: L.Map | null; onClose: () => void 
               </span>
               <div>
                 <div className="text-sm font-bold">{b.label}</div>
-                <div className="text-[11px] text-ink-3">{b.id === 'local' ? 'Siempre disponible' : b.id === 'satelite' ? 'Esri World Imagery' : b.id === 'topo' ? 'Esri' : 'OpenStreetMap y CARTO'}</div>
+                <div className="text-[11px] text-ink-3">{b.id === 'local' ? 'Siempre disponible' : b.id === 'satelite' ? 'Esri World Imagery' : b.id === 'topo' ? 'Esri' : 'OpenStreetMap'}</div>
               </div>
               {on && <Check size={18} className="ml-auto text-ink" />}
             </button>
